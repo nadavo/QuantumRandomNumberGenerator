@@ -1,5 +1,7 @@
-# QuantumRandomNumberGenerator
-### Random Number Generator Utilizing IBM's Quantum Experience Computer with [ProjectQ](https://github.com/ProjectQ-Framework/ProjectQ)
+# Quantum Random Number Generator
+### Random Number Generator Utilizing [ProjectQ](https://github.com/ProjectQ-Framework/ProjectQ) and IBM's Quantum Experience Computer
+
+Generate a ("true") random integer between [0,N] utilizing ProjectQ and IBM's quantum computer
 
 **Dependencies:**
 * Python 3.6
