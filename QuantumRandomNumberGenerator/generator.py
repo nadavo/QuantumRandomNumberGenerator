@@ -7,16 +7,19 @@ from projectq.backends import IBMBackend
 
 class QuantumRandomNumberGenerator:
 
-    def __init__(self, credemtials=None):
-        self.quantum_engine = self.initialize_quantum_engine(credemtials)
+    def __init__(self, credentials=None, remote_hardware=False):
+        self.credentials = credentials
+        self.remote_hardware = remote_hardware
 
-    def initialize_quantum_engine(self, credentials):
+    def initialize_quantum_engine(self):
         """
         Quantum Engine Initializer
-        (pass credentials dictionary to use IBM's Quantum Computer with your username and password, otherwise will simulate locally)
+        (pass credentials namedtuple to use IBM's Quantum Computer with your username and password, otherwise will simulate locally)
         """
-        if credentials:
-            quantum_engine = MainEngine(IBMBackend(user=credentials.username, password=credentials.password),
+        if self.credentials:
+            quantum_engine = MainEngine(IBMBackend(user=self.credentials.username,
+                                                   password=self.credentials.password,
+                                                   use_hardware=self.remote_hardware),
                                         engine_list=projectq.setups.ibm.get_engine_list())
         else:
             quantum_engine = MainEngine()
@@ -30,12 +33,14 @@ class QuantumRandomNumberGenerator:
         1 or 0.
         Based on example from: https://projectq.readthedocs.io/en/latest/examples.html
         """
-        qubit = self.quantum_engine.allocate_qubit()
+        engine = self.initialize_quantum_engine()
+        qubit = engine.allocate_qubit()
         H | qubit
         Measure | qubit
-        self.quantum_engine.flush()
+        engine.flush()
         random_binary = int(qubit)
-        self.quantum_engine.flush(deallocate_qubits=True)
+        if isinstance(engine.backend, projectq.backends.IBMBackend):
+            engine.deallocate_qubit(qubit[0])
         return random_binary
 
     def generate_random_number(self, n, rejection_price=1):
